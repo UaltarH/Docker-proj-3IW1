@@ -1,0 +1,19 @@
+version: '3'
+services:
+  nginx:
+    image: nginx
+    ports:
+      - 8080:80
+    volumes:
+      - ./php_file/:/var/www/html/
+    networks:
+      - internal
+  php:
+    image: php
+    volumes:
+      - ./php_file/:/var/www/html/
+    networks:
+      - internal
+networks:
+  internal:
+    driver: bridge
