@@ -5,7 +5,7 @@ services:
     ports:
       - 8080:80
     volumes:
-      - ./webfile/:/var/www/html/
+      - ./webfile/public:/var/www/html/
       - ./nginx/:/etc/nginx/conf.d
     depends_on:
       - php
@@ -13,5 +13,18 @@ services:
   php:
     build: ./php/
     volumes:
-      - ./webfile/:/var/www/html/
+      - ./webfile/public:/var/www/html/
 
+  bdd:
+    image: mysql:5.7
+    ports: 
+      - 3306:3306
+    environment:
+      MYSQL_DATABASE: proj
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_PASSWORD: root
+      MYSQL_USER: root
+      SERVICE_TAGS: local
+      SERVICE_NAME: mysql
+  
+  

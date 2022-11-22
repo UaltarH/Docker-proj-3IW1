@@ -1,5 +1,4 @@
 <?php
-echo("ta trop la rage"); 
-phpinfo();
 
+echo "hello";
 ?>
