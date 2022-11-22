@@ -5,15 +5,13 @@ services:
     ports:
       - 8080:80
     volumes:
-      - ./php_file/:/var/www/html/
-    networks:
-      - internal
+      - ./webfile/:/var/www/html/
+      - ./nginx/:/etc/nginx/conf.d
+    depends_on:
+      - php
+
   php:
-    image: php
+    build: ./php/
     volumes:
-      - ./php_file/:/var/www/html/
-    networks:
-      - internal
-networks:
-  internal:
-    driver: bridge
+      - ./webfile/:/var/www/html/
+
