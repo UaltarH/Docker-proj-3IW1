@@ -1,30 +1,76 @@
 version: '3'
 services:
-  nginx:
-    image: nginx
-    ports:
-      - 8080:80
-    volumes:
-      - ./webfile/public:/var/www/html/
-      - ./nginx/:/etc/nginx/conf.d
-    depends_on:
-      - php
-
-  php:
-    build: ./php/
-    volumes:
-      - ./webfile/public:/var/www/html/
-
+  
+  # DATABASE
   bdd:
+    platform: linux/x86_64
     image: mysql:5.7
     ports: 
       - 3306:3306
     environment:
-      MYSQL_DATABASE: proj
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_PASSWORD: root
-      MYSQL_USER: root
-      SERVICE_TAGS: local
-      SERVICE_NAME: mysql
-  
-  
+      MYSQL_DATABASE: proj
+      MYSQL_USER: user
+      MYSQL_PASSWORD: user
+
+  # LARAVEL 1
+  php1:
+    build: ./php/
+    ports:
+      - 9000:9000
+    volumes:
+      - ./webfile1/public/:/var/www/html/
+    depends_on:
+      - bdd
+
+  # LARAVEL 2
+  php2:
+    build: ./php/
+    ports:
+      - 8999:9000
+    volumes:
+      - ./webfile2/public/:/var/www/html/
+    depends_on:
+      - bdd
+
+  # SERVER 1
+  nginx1:
+    build:
+      context: ./nginx/
+      args: 
+        - FILE_NAME=nginx1.conf 
+    ports:
+      - 8080:80
+    volumes:
+      - ./webfile1/public:/var/www/html/
+    depends_on:
+      - bdd
+    
+  # SERVER 2
+  nginx2:
+    build:
+      context: ./nginx/
+      args: 
+        - FILE_NAME=nginx2.conf 
+    ports:
+      - 8081:80
+    volumes:
+      - ./webfile2/public:/var/www/html/
+    depends_on:
+      - bdd
+
+  composer:
+    image: composer 
+    volumes:
+      - ./webfile1/public/:/app
+      - ./webfile2/public/:/app
+    working_dir: /app
+    command: composer update && composer install
+
+  npm:
+    image: "node"
+    volumes:
+      - "./webfile1/public/:/app"
+      - "./webfile2/public/:/app"
+    working_dir: /app
+    command: bash -c "npm install npm && npm run build"
